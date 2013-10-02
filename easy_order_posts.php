@@ -11,6 +11,7 @@ Author URI: http://matgargano.com
 /*
  * Filters:
  * easy_order_posts_post_types - modify the post types to apply this plugin to 
+ * easy_order_posts_capability - modify the capability of user to be able to update post_type order
  *
  * Domain:
  * easy-order-posts
@@ -48,8 +49,10 @@ class easy_order_posts {
 
     public static function register_settings(){
         $post_types = self::get_post_types();
-        foreach( $post_types as $post_type ){
-            register_setting( $post_type . '_order', $post_type . '_order', array(__CLASS__, 'post_type_order_save' ) );
+        if ( is_array( $post_types ) ) {
+            foreach( $post_types as $post_type ){
+                register_setting( $post_type . '_order', $post_type . '_order', array(__CLASS__, 'post_type_order_save' ) );
+            }
         }
     }
 
@@ -95,7 +98,7 @@ class easy_order_posts {
 
     public static function set_menu_order( $post_id, $counter ) {
         global $wpdb;   
-        $wpdb->update( $wpdb->posts, array( 'menu_order' => $counter ), array('ID' => $post_id ) );
+        $wpdb->update( $wpdb->posts, array( 'menu_order' => $counter ), array( 'ID' => $post_id ) );
     }
 
     /**
@@ -153,12 +156,15 @@ class easy_order_posts {
 
     public static function add_menus(){
         $post_types = self::get_post_types();
-        foreach( $post_types as $post_type ) {
-            $title_name = get_post_type_object( $post_type )->labels->name;
-            if ( $post_type === 'post' ) { 
-                add_submenu_page('edit.php', __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), 'activate_plugins', self::PAGE_PREFIX . $post_type, array( __CLASS__, 'admin_page' ) );
-            } else {
-                add_submenu_page('edit.php?post_type=' . $post_type, __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), __( 'Order ' . $post_type, self::TRANSLATE_DOMAIN ), 'activate_plugins', self::PAGE_PREFIX . $post_type, array( __CLASS__, 'admin_page' ) );
+        $capability = apply_filters( 'easy_order_posts_capability', 'activate_plugins' ) ;
+        if ( is_array( $post_types ) ) {
+            foreach( $post_types as $post_type ) {
+                $title_name = get_post_type_object( $post_type )->labels->name;
+                if ( $post_type === 'post' ) { 
+                    add_submenu_page('edit.php', __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), $capability, self::PAGE_PREFIX . $post_type, array( __CLASS__, 'admin_page' ) );
+                } else {
+                    add_submenu_page('edit.php?post_type=' . $post_type, __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), __( 'Order ' . $post_type, self::TRANSLATE_DOMAIN ), $capability, self::PAGE_PREFIX . $post_type, array( __CLASS__, 'admin_page' ) );
+                }
             }
         }
     }
