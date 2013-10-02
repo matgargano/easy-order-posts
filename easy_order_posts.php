@@ -4,7 +4,7 @@ Plugin Name: Easy Order Posts
 Plugin URI: http://matgargano.com
 Description: Drag and Drop Post Order for All of Your Post Types
 Author: Mat Gargano
-Version: 1.0
+Version: 0.1
 Author URI: http://matgargano.com
 */
 
@@ -15,6 +15,7 @@ Author URI: http://matgargano.com
  *
  * Domain:
  * easy-order-posts
+ *
  */
 
 class easy_order_posts {
@@ -161,9 +162,9 @@ class easy_order_posts {
             foreach( $post_types as $post_type ) {
                 $title_name = get_post_type_object( $post_type )->labels->name;
                 if ( $post_type === 'post' ) { 
-                    add_submenu_page('edit.php', __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), $capability, self::PAGE_PREFIX . $post_type, array( __CLASS__, 'admin_page' ) );
+                    add_submenu_page( 'edit.php', __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), $capability, self::PAGE_PREFIX . $post_type, array( __CLASS__, 'admin_page' ) );
                 } else {
-                    add_submenu_page('edit.php?post_type=' . $post_type, __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), __( 'Order ' . $post_type, self::TRANSLATE_DOMAIN ), $capability, self::PAGE_PREFIX . $post_type, array( __CLASS__, 'admin_page' ) );
+                    add_submenu_page( 'edit.php?post_type=' . $post_type, __( 'Order ' . $title_name, self::TRANSLATE_DOMAIN ), __( 'Order ' . $post_type, self::TRANSLATE_DOMAIN ), $capability, self::PAGE_PREFIX . $post_type, array( __CLASS__, 'admin_page' ) );
                 }
             }
         }
